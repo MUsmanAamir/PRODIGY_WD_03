@@ -1,4 +1,3 @@
-
 let cells, currentPlayer, board, gameMode, winningCombination;
 
 const winningCombinations = [
@@ -20,14 +19,13 @@ function startGame(mode) {
     document.getElementById('game-board').classList.remove('hidden');
     document.getElementById('game-settings').classList.add('hidden');
     document.getElementById('winner-display').classList.add('hidden');
-    document.getElementById('winning-line').classList.add('hidden');
-    document.getElementById('winning-line').classList.remove('horizontal', 'vertical', 'diagonal');
-    updateTurnDisplay();
     cells.forEach(cell => {
         cell.textContent = '';
+        cell.style.backgroundColor = ''; // Reset background color
         cell.removeEventListener('click', handleClick);
         cell.addEventListener('click', handleClick, { once: true });
     });
+    updateTurnDisplay();
 }
 
 function handleClick(event) {
@@ -44,7 +42,7 @@ function handleClick(event) {
     if (checkWinner()) {
         document.getElementById('winner-player').textContent = (gameMode === 'ai' && currentPlayer === 'O') ? 'AI Wins' : 'Player Wins';
         document.getElementById('winner-display').classList.remove('hidden');
-        showWinningLine();
+        highlightWinningCells();
         return;
     } else if (board.every(cell => cell !== null)) {
         document.getElementById('winner-player').textContent = 'Draw';
@@ -79,26 +77,8 @@ function aiMove() {
     cells[randomIndex].click();
 }
 
-function showWinningLine() {
-    const winningLine = document.getElementById('winning-line');
-    winningLine.classList.remove('hidden');
-    const [a, b, c] = winningCombination;
-
-    if (a % 3 === b % 3 && b % 3 === c % 3) {
-        // Vertical win
-        winningLine.classList.add('vertical');
-        winningLine.style.transform = `translateX(${(a % 3) * 100 + 50}px) scaleY(1)`;
-    } else if (Math.floor(a / 3) === Math.floor(b / 3) && Math.floor(b / 3) === Math.floor(c / 3)) {
-        // Horizontal win
-        winningLine.classList.add('horizontal');
-        winningLine.style.transform = `translateY(${Math.floor(a / 3) * 100 + 50}px) scaleX(1)`;
-    } else if ((a === 0 && c === 8) || (a === 2 && c === 6)) {
-        // Diagonal win
-        winningLine.classList.add('diagonal');
-        if (a === 0) {
-            winningLine.style.transform = 'rotate(45deg) translate(0, -100px) scaleX(1)';
-        } else {
-            winningLine.style.transform = 'rotate(-45deg) translate(0, 100px) scaleX(1)';
-        }
-    }
+function highlightWinningCells() {
+    winningCombination.forEach(index => {
+        cells[index].style.backgroundColor = 'lightgreen'; // Highlight winning cells
+    });
 }
